@@ -156,8 +156,12 @@ export class Agent {
         return 'reading';
       case 'reviewing': case 'testing': case 'validating':
         return 'inspecting';
-      case 'planning': case 'analyzing': case 'decomposing':
+      case 'planning': case 'analyzing': case 'decomposing': case 'reflecting':
         return 'thinking';
+      case 'speaking':
+        return 'chatting';
+      case 'listening':
+        return 'idle';
       case 'waiting_approval': case 'blocked':
         return 'waiting';
       case 'success':

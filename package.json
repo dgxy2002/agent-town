@@ -20,6 +20,7 @@
     "dev": "next dev",
     "build": "next build",
     "build:lib": "vite build",
+    "convert:scenario": "node scripts/convert-tinytroupe-run.mjs scenarios/hdb-space scenarios/hdb-space/run-004.json scenarios/hdb-space/agent-town.json",
     "start": "next start"
   },
   "keywords": [

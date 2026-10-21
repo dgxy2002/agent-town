@@ -442,6 +442,25 @@ events.onmessage = (e) => {
 };
 ```
 
+## Replay a TinyTroupe Scenario
+
+This fork can convert a TinyTroupe run plus its persona files into a compact Agent Town replay. The converter keeps participant metadata, ordered `THINK` / `TALK` / `DONE` events, evaluation results, and resource metrics while dropping embeddings and raw provider payloads.
+
+```bash
+node scripts/convert-tinytroupe-run.mjs \
+  scenarios/hdb-space \
+  scenarios/hdb-space/run-004.json \
+  scenarios/hdb-space/agent-town.json
+```
+
+For the included HDB scenario, the same command is available as:
+
+```bash
+npm run convert:scenario
+```
+
+Run `npm run dev`, then select **HDB Space Replay (4)** from the Preset menu. Agent Town maps the social actions to `reflecting`, `speaking`, and `listening` activity states and exposes the run outcome in the Scenario panel. Re-run the converter whenever the source run or personas change.
+
 ## Development
 
 ```bash

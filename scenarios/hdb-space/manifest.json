@@ -1,0 +1,32 @@
+{
+  "created_at": "2026-10-21T16:40:07.606279+00:00",
+  "embedding_model": "openai/text-embedding-3-small",
+  "evaluation_sha256": "d848ca4f8b4191b545e473fab1ccf010d6ae96efb54eef61e4213e9870a9c1c3",
+  "experiment_id": "hdb-space-10x10-20261022",
+  "fixed_horizon": true,
+  "full_run_embedding": false,
+  "git_commit": "c0a8f727818d354f3fbef9e96aa0ab80d34ea09a",
+  "judge_model": "openai/gpt-5-mini",
+  "model": "openai/gpt-4o-mini",
+  "participant_keys": [
+    "cook",
+    "sensitive_housemate",
+    "practical_housemate",
+    "conflict_averse_housemate"
+  ],
+  "persona_sha256": {
+    "conflict_averse_housemate": "ccabd97f4ceffe3c1d97327cb82968a4685722eae4008f81c6c9015b574620a1",
+    "cook": "66defbbe765c28ca48dff974aca8a07e7ec420384608a65cd2e3a69b20f95efb",
+    "practical_housemate": "205fcaa0a39c8cb75764b671dfaeecd9858e8b749bca8c6f3089d17483d66c60",
+    "sensitive_housemate": "3fb286e1ebcc432338f5d50bd5a1e05f69d158ae843b5d980e1e24993b13be21"
+  },
+  "principal_participant_keys": [
+    "cook",
+    "sensitive_housemate"
+  ],
+  "round_embeddings": true,
+  "rounds": 10,
+  "runs": 10,
+  "scenario": "hdb-space",
+  "scenario_sha256": "8f556e8a8200a1a24958ab682cfdc765c1761c30fd579f29a52443ea0840b559"
+}

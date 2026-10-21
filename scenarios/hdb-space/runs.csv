@@ -1,0 +1,11 @@
+category,completed_rounds,cost_usd,exact_cost_complete,model,outcome,repetition_onset_round,repetitive,resolution_round,resolved,run_id,scenario,total_tokens,transcript
+Resolved + repetitive,10,0.03760713,True,openai/gpt-4o-mini,compromise,4,True,2,True,run-001,hdb-space,308359,../transcripts/run-001.md
+Unresolved + not repetitive,10,0.03828146,True,openai/gpt-4o-mini,unresolved,,False,,False,run-002,hdb-space,311656,../transcripts/run-002.md
+Resolved + repetitive,10,0.04144893,True,openai/gpt-4o-mini,compromise,6,True,9,True,run-003,hdb-space,321720,../transcripts/run-003.md
+Unresolved + repetitive,10,0.03729408,True,openai/gpt-4o-mini,unresolved,4,True,,False,run-004,hdb-space,309853,../transcripts/run-004.md
+Unresolved + repetitive,10,0.03700743,True,openai/gpt-4o-mini,unresolved,5,True,,False,run-005,hdb-space,309996,../transcripts/run-005.md
+Resolved + not repetitive,10,0.03683364,True,openai/gpt-4o-mini,compromise,,False,2,True,run-006,hdb-space,305719,../transcripts/run-006.md
+Resolved + not repetitive,10,0.03755116,True,openai/gpt-4o-mini,compromise,,False,5,True,run-007,hdb-space,312600,../transcripts/run-007.md
+Unresolved + not repetitive,10,0.04642947,True,openai/gpt-4o-mini,unresolved,,False,,False,run-008,hdb-space,321373,../transcripts/run-008.md
+Resolved + not repetitive,10,0.04268406,True,openai/gpt-4o-mini,consensus,,False,3,True,run-009,hdb-space,338640,../transcripts/run-009.md
+Unresolved + repetitive,10,0.05075126,True,openai/gpt-4o-mini,unresolved,5,True,,False,run-010,hdb-space,338624,../transcripts/run-010.md

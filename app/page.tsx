@@ -14,17 +14,23 @@ import { ChatPanel } from '../components/panels/ChatPanel';
 import { ManagePanel } from '../components/panels/ManagePanel';
 import { SettingsPanel } from '../components/panels/SettingsPanel';
 import { TimelinePanel } from '../components/panels/TimelinePanel';
+import { ScenarioPanel } from '../components/panels/ScenarioPanel';
 import { WorkspaceSelector } from '../components/WorkspaceSelector';
 import { AgentSimulation } from '../lib/simulation';
 import { SCENARIOS, type Scenario } from '../lib/scenarios';
+import { ScenarioReplayPlayer, type ScenarioReplay } from '../lib/scenario-replay';
+import hdbSpaceReplayJson from '../scenarios/hdb-space/agent-town.json';
 import type { AgentTown } from '../src/index';
-import type { EnvironmentId, ThemeId } from '../src/index';
+import { DEFAULT_STAGES, type EnvironmentId, type ThemeId } from '../src/index';
 
 type PresetKey = keyof typeof SCENARIOS;
+type PresetSelection = PresetKey | 'hdb-space';
+const HDB_SPACE_REPLAY = hdbSpaceReplayJson as unknown as ScenarioReplay;
 
 export default function PlaygroundPage() {
   const townRef = useRef<AgentTown | null>(null);
   const simRef = useRef<AgentSimulation | null>(null);
+  const replayRef = useRef<ScenarioReplayPlayer | null>(null);
   const uiIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const spawnTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -35,6 +41,7 @@ export default function PlaygroundPage() {
   const [speed, setSpeed] = useState(1);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [viewMode, setViewMode] = useState<'canvas' | 'dashboard'>('canvas');
+  const [activeReplay, setActiveReplay] = useState<ScenarioReplay | null>(null);
   const [, setTick] = useState(0);
   const rerender = useCallback(() => setTick(t => t + 1), []);
 
@@ -60,6 +67,7 @@ export default function PlaygroundPage() {
     const v = parseFloat(e.target.value);
     setSpeed(v);
     simRef.current?.setSpeed(v);
+    replayRef.current?.setSpeed(v);
   }, []);
 
   const startSimulation = useCallback((presetKey: PresetKey) => {
@@ -68,6 +76,10 @@ export default function PlaygroundPage() {
     if (!town || !sim) return;
 
     stopSimulation();
+    replayRef.current = null;
+    setActiveReplay(null);
+    setActiveTab('agents');
+    town.setStages(DEFAULT_STAGES);
 
     const scenario = SCENARIOS[presetKey];
     const agentCount = scenario.agents.length;
@@ -148,14 +160,58 @@ export default function PlaygroundPage() {
     rerender();
   }, [rerender]);
 
+  const startReplay = useCallback((replay: ScenarioReplay) => {
+    const town = townRef.current;
+    const sim = simRef.current;
+    if (!town || !sim) return;
+
+    stopSimulation();
+    sim.agentStates.clear();
+    town.setEnvironment('office');
+    setEnv('office');
+
+    const player = new ScenarioReplayPlayer(town, replay);
+    player.onUpdate = rerender;
+    player.onComplete = () => {
+      setSimStatus('stopped');
+      rerender();
+    };
+    player.setSpeed(speed);
+    player.seed();
+    for (const participant of replay.participants) sim.addAgent(participant.id);
+    replayRef.current = player;
+    setActiveReplay(replay);
+    setActiveTab('scenario');
+    player.start();
+    setSimStatus('running');
+    rerender();
+  }, [rerender, speed]);
+
+  const startPreset = useCallback((selection: PresetSelection) => {
+    if (selection === 'hdb-space') startReplay(HDB_SPACE_REPLAY);
+    else startSimulation(selection);
+  }, [startReplay, startSimulation]);
+
   const stopSimulation = useCallback(() => {
     simRef.current?.stop();
+    replayRef.current?.stop();
     if (spawnTimerRef.current) { clearTimeout(spawnTimerRef.current); spawnTimerRef.current = null; }
     if (uiIntervalRef.current) { clearInterval(uiIntervalRef.current); uiIntervalRef.current = null; }
     setSimStatus('stopped');
   }, []);
 
   const togglePause = useCallback(() => {
+    const replay = replayRef.current;
+    if (replay?.running) {
+      if (replay.paused) {
+        replay.resume();
+        setSimStatus('running');
+      } else {
+        replay.pause();
+        setSimStatus('paused');
+      }
+      return;
+    }
     const sim = simRef.current;
     if (!sim) return;
     if (sim.paused) {
@@ -170,6 +226,7 @@ export default function PlaygroundPage() {
   useEffect(() => {
     return () => {
       simRef.current?.destroy();
+      replayRef.current?.stop();
       if (spawnTimerRef.current) clearTimeout(spawnTimerRef.current);
       if (uiIntervalRef.current) clearInterval(uiIntervalRef.current);
     };
@@ -180,6 +237,7 @@ export default function PlaygroundPage() {
 
   const tabs = [
     { id: 'agents', label: 'Agents' },
+    ...(activeReplay ? [{ id: 'scenario', label: 'Scenario' }] : []),
     { id: 'project', label: 'Project' },
     { id: 'kanban', label: 'Kanban' },
     { id: 'timeline', label: 'Timeline' },
@@ -216,13 +274,14 @@ export default function PlaygroundPage() {
       )}
       <Control label="Preset">
         <select
-          onChange={(e) => e.target.value && startSimulation(e.target.value as PresetKey)}
+          onChange={(e) => e.target.value && startPreset(e.target.value as PresetSelection)}
           defaultValue=""
         >
           <option value="" disabled>Select...</option>
           <option value="startup">Startup (4)</option>
           <option value="sprint">Sprint Team (8)</option>
           <option value="enterprise">Enterprise (12)</option>
+          <option value="hdb-space">HDB Space Replay (4)</option>
         </select>
       </Control>
       <Control label="Speed">
@@ -259,6 +318,9 @@ export default function PlaygroundPage() {
       {town && sim && (
         <>
           {activeTab === 'agents' && <AgentPanel town={town} sim={sim} />}
+          {activeTab === 'scenario' && (
+            <ScenarioPanel replay={activeReplay} cursor={replayRef.current?.cursor ?? 0} />
+          )}
           {activeTab === 'project' && <ProjectPanel town={town} />}
           {activeTab === 'kanban' && <KanbanPanel town={town} />}
           {activeTab === 'timeline' && <TimelinePanel town={town} />}
@@ -274,7 +336,11 @@ export default function PlaygroundPage() {
               speed={speed}
               onEnvChange={(v) => { setEnv(v); town.setEnvironment(v); }}
               onThemeChange={(v) => { setTheme(v); town.setTheme(v); }}
-              onSpeedChange={(v) => { setSpeed(v); simRef.current?.setSpeed(v); }}
+              onSpeedChange={(v) => {
+                setSpeed(v);
+                simRef.current?.setSpeed(v);
+                replayRef.current?.setSpeed(v);
+              }}
             />
           )}
           {activeTab === 'chat' && <ChatPanel town={town} sim={sim} />}

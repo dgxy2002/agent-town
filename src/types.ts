@@ -13,6 +13,8 @@ export type AgentActivity =
   | 'committing' | 'pushing' | 'deploying'
   // Review phase
   | 'reviewing' | 'waiting_approval'
+  // Social simulation
+  | 'reflecting' | 'speaking' | 'listening'
   // Terminal / meta
   | 'idle' | 'success' | 'error' | 'paused' | 'blocked';
 

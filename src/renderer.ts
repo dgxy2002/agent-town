@@ -21,6 +21,8 @@ const ACTIVITY_COLORS: Record<AgentActivity, string> = {
   committing: '#5B5EA6', pushing: '#6C5CE7', deploying: '#4834D4',
   // Review — orange
   reviewing: '#E67E22', waiting_approval: '#F39C12',
+  // Social simulation
+  reflecting: '#F1C40F', speaking: '#27AE60', listening: '#5DADE2',
   // Terminal states
   idle: '#95A5A6', success: '#27AE60', error: '#E74C3C',
   paused: '#BDC3C7', blocked: '#C0392B',
